@@ -221,8 +221,16 @@ below will help you inspect them.
 
 Displays a table of the current settings of all wants.
 
+=head1 SEE ALSO
+
+L<Test::Is> - Skip test in a declarative way, following the Lancaster Consensus
+
 =head1 AUTHOR
 
 Matthew Horsfall (alh) - <wolfsage@gmail.com>
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
 
 =cut
