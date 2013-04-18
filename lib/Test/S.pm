@@ -159,5 +159,3 @@ Matthew Horsfall (alh) - <wolfsage@gmail.com>
 You may distribute this code under the same terms as Perl itself.
 
 =cut
-
-=cut
