@@ -12,12 +12,14 @@ our @EXPORT_OK = qw(
 	want_extended
 	want_author
 	want_release
+	want_all
 
 	enable_smoke
 	enable_non_interactive
 	enable_extended
 	enable_author
 	enable_release
+	enable_all
 
 	disable_smoke
 	disable_non_interactive
@@ -25,31 +27,101 @@ our @EXPORT_OK = qw(
 	disable_extended
 	disable_author
 	disable_release
+	disable_all
 
 	current_settings
+	current_settings_env
+	current_settings_env_all
 );
 
 our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 );
 
-sub want_smoke           { return $ENV{AUTOMATED_TESTING} };
-sub want_non_interactive { return $ENV{NON_INTERACTIVE}   };
-sub want_extended        { return $ENV{EXTENDED_TESTING}  };
-sub want_author          { return $ENV{AUTHOR_TESTING}    };
-sub want_release         { return $ENV{RELEASE_TESTING}   };
+# Things we currently know about
+my %flags = (
+	want_smoke           => 'AUTOMATED_TESTING',
+	want_non_interactive => 'NON_INTERACTIVE',
+	want_extended        => 'EXTENDED_TESTING',
+	want_author          => 'AUTHOR_TESTING',
+	want_release         => 'RELEASE_TESTING',
+);
 
-sub enable_smoke           { $ENV{AUTOMATED_TESTING} = 1; }
-sub enable_non_interactive { $ENV{NON_INTERACTIVE}   = 1; }
-sub enable_extended        { $ENV{EXTENDED_TESTING}  = 1; }
-sub enable_author          { $ENV{AUTHOR_TESTING}    = 1; }
-sub enable_release         { $ENV{RELEASE_TESTING}   = 1; }
+sub _get_env_name {
+	my ($flag) = @_;
 
-sub disable_smoke           { delete $ENV{AUTOMATED_TESTING} }
-sub disable_non_interactive { delete $ENV{NON_INTERACTIVE} }
-sub disable_extended        { delete $ENV{EXTENDED_TESTING} }
-sub disable_author          { delete $ENV{AUTHOR_TESTING} }
-sub disable_release         { delete $ENV{RELEASE_TESTING}  }
+	if ($flags{$flag}) {
+		return $flags{$flag};
+	} else {
+		require Carp;
+		Carp::croak("No such flag $flag\n");
+	}
+}
+
+sub _get_flag {
+	my ($flag) = @_;
+
+	my $env_name = _get_env_name($flag);
+
+	return $ENV{$env_name};
+}
+
+sub _set_flag {
+	my ($flag) = @_;
+
+	my $env_name = _get_env_name($flag);
+
+	$ENV{$env_name} = 1;
+}
+
+sub _clear_flag {
+	my ($flag) = @_;
+
+	my $env_name = _get_env_name($flag);
+
+	delete $ENV{$env_name};
+}
+
+sub want_smoke           { _get_flag('want_smoke')           }
+sub want_non_interactive { _get_flag('want_non_interactive') }
+sub want_extended        { _get_flag('want_extended')        }
+sub want_author          { _get_flag('want_author')          }
+sub want_release         { _get_flag('want_release')         }
+sub want_all {
+	return 1 if
+	  want_smoke &&
+	  want_non_interactive &&
+	  want_extended &&
+	  want_author &&
+	  want_release
+	;
+}
+
+sub enable_smoke           { _set_flag('want_smoke')           }
+sub enable_non_interactive { _set_flag('want_non_interactive') }
+sub enable_extended        { _set_flag('want_extended')        }
+sub enable_author          { _set_flag('want_author')          }
+sub enable_release         { _set_flag('want_release')         }
+sub enable_all {
+	enable_smoke;
+	enable_non_interactive;
+	enable_extended;
+	enable_author;
+	enable_release;
+}
+
+sub disable_smoke           { _clear_flag('want_smoke')           }
+sub disable_non_interactive { _clear_flag('want_non_interactive') }
+sub disable_extended        { _clear_flag('want_extended')        }
+sub disable_author          { _clear_flag('want_author')          }
+sub disable_release         { _clear_flag('want_release')         }
+sub disable_all {
+	disable_smoke;
+	disable_non_interactive;
+	disable_extended;
+	disable_author;
+	disable_release;
+}
 
 sub current_settings {
 	my @values = (
@@ -68,6 +140,36 @@ want_author:          %s
 want_release:         %s
 EOF
 
+}
+
+sub current_settings_env {
+	my $output = '';
+
+	for my $flag (sort keys %flags) {
+		my $env_name = _get_env_name($flag);
+
+		if (my $f = _get_flag($flag)) {
+			$output .= sprintf("%s=1\n", $env_name);
+		}
+	}
+
+	return $output;
+}
+
+sub current_settings_env_all {
+	my $output = '';
+
+	for my $flag (sort keys %flags) {
+		my $env_name = _get_env_name($flag);
+
+		if (my $f = _get_flag($flag)) {
+			$output .= sprintf("%s=1\n", $env_name);
+		} else {
+			$output .= sprintf("%s=0\n", $env_name);
+		}
+	}
+
+	return $output;
 }
 
 1;
@@ -92,6 +194,8 @@ Check the current settings
   if (want_author) { ... }
   if (want_release) { ... }
 
+  if (want_all) { ... }
+
 Change settings
 
   enable_smoke;
@@ -99,16 +203,26 @@ Change settings
   enable_extended;
   enable_author;
   enable_release;
+  enable_all;
 
   disable_smoke;
   disable_non_interactive;
   disable_extended;
   disable_author;
   disable_release;
+  disable_all;
 
 Helper - see the settings as a string
 
   print current_settings;
+
+Print enabled settings as ENV vars
+
+  print current_settings_env;
+
+Print all settings as ENV vars
+
+  print current_settings_env_all;
 
 =head1 DESCRIPTION
 
@@ -160,6 +274,12 @@ Returns true if release testing has been requested. Release tests are used when
 a new release of a distribution is going to be built to check sanity before 
 pushing to CPAN.
 
+=head3 want_all
+
+  if (want_all) { ... }
+
+Returns true if all of the above wants are true.
+
 =head2 Changing the state of things
 
 The methods below allow modification of the state of testing. This can be used 
@@ -210,6 +330,12 @@ This enables or disables (default) author testing.
 
 This enables or disables (default) release testing.
 
+=head3 enable_all
+
+=head3 disable_all
+
+Enable or disable all of the test switches at once.
+
 =head2 Extra information
 
 If you'd like a quick representation of the current state of things, the methods 
@@ -221,6 +347,20 @@ below will help you inspect them.
   print $str;
 
 Displays a table of the current settings of all wants.
+
+=head3 current_settings_env
+
+  my $str = current_settings_env();
+  print $str;
+
+Prints enabled settings only as ENV vars.
+
+=head3 current_settings_env_all
+
+  my $str = current_settings_env_all();
+  print $str
+
+Prints ALL settings asa ENV vars.
 
 =head1 SEE ALSO
 
