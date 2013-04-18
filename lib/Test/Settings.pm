@@ -364,6 +364,10 @@ Prints ALL settings asa ENV vars.
 
 =head1 SEE ALSO
 
+L<Test::S> - Change test settings on the command line
+
+L<Test::DescribeMe> - Tell test runners what kind of test you are
+
 L<Test::Is> - Skip test in a declarative way, following the Lancaster Consensus
 
 =head1 AUTHOR
