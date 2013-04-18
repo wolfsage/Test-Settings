@@ -3,7 +3,8 @@ package Test::Settings;
 use strict;
 use warnings;
 
-use Exporter qw(import);
+use Exporter;
+our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(
 	want_smoke
