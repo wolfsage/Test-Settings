@@ -360,7 +360,7 @@ Prints enabled settings only as ENV vars.
   my $str = current_settings_env_all();
   print $str
 
-Prints ALL settings asa ENV vars.
+Prints ALL settings as ENV vars.
 
 =head1 SEE ALSO
 
