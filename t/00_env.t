@@ -10,7 +10,7 @@ use Test::Settings qw(:all);
 # Clean up our ENV first...
 for my $k (qw(
 	AUTOMATED_TESTING
-	NON_INTERACTIVE
+	NONINTERACTIVE_TESTING
 	EXTENDED_TESTING
 	AUTHOR_TESTING
 	RELEASE_TESTING
@@ -58,7 +58,7 @@ EOF
 is(current_settings_env, <<EOF, "current_settings_env is correct");
 AUTHOR_TESTING=1
 EXTENDED_TESTING=1
-NON_INTERACTIVE=1
+NONINTERACTIVE_TESTING=1
 RELEASE_TESTING=1
 AUTOMATED_TESTING=1
 EOF
@@ -66,7 +66,7 @@ EOF
 is(current_settings_env_all, <<EOF, "current_settings_env is correct");
 AUTHOR_TESTING=1
 EXTENDED_TESTING=1
-NON_INTERACTIVE=1
+NONINTERACTIVE_TESTING=1
 RELEASE_TESTING=1
 AUTOMATED_TESTING=1
 EOF
@@ -103,7 +103,7 @@ is(current_settings_env, '', "current_settings_env is correct");
 is(current_settings_env_all, <<EOF, "current_settings_env_all is correct");
 AUTHOR_TESTING=0
 EXTENDED_TESTING=0
-NON_INTERACTIVE=0
+NONINTERACTIVE_TESTING=0
 RELEASE_TESTING=0
 AUTOMATED_TESTING=0
 EOF

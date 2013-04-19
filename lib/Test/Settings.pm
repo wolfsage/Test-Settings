@@ -41,7 +41,7 @@ our %EXPORT_TAGS = (
 # Things we currently know about
 my %flags = (
 	want_smoke           => 'AUTOMATED_TESTING',
-	want_non_interactive => 'NON_INTERACTIVE',
+	want_non_interactive => 'NONINTERACTIVE_TESTING',
 	want_extended        => 'EXTENDED_TESTING',
 	want_author          => 'AUTHOR_TESTING',
 	want_release         => 'RELEASE_TESTING',
@@ -369,6 +369,9 @@ L<Test::S> - Change test settings on the command line
 L<Test::DescribeMe> - Tell test runners what kind of test you are
 
 L<Test::Is> - Skip test in a declarative way, following the Lancaster Consensus
+
+L<https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md> -
+The Annotated Lancaster Consensus
 
 =head1 AUTHOR
 
